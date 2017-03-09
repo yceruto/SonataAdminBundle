@@ -386,6 +386,14 @@ class HelperControllerTest extends \PHPUnit_Framework_TestCase
     {
         $object = new AdminControllerHelper_Foo();
 
+        $request = new Request(array(
+            'code' => 'sonata.post.admin',
+            'objectId' => 42,
+            'field' => 'enabled',
+            'value' => 1,
+            'context' => 'list',
+        ), array(), array(), array(), array(), array('REQUEST_METHOD' => 'POST'));
+
         $modelManager = $this->getMock('Sonata\AdminBundle\Model\ModelManagerInterface');
         $modelManager->expects($this->once())->method('find')->will($this->returnValue($object));
 
@@ -396,6 +404,15 @@ class HelperControllerTest extends \PHPUnit_Framework_TestCase
         $mockForm = $this->getMockBuilder('Symfony\Component\Form\Form')
             ->disableOriginalConstructor()
             ->getMock();
+
+        $mockForm->expects($this->once())
+            ->method('setData')
+            ->with($object);
+
+        $mockForm->expects($this->once())
+            ->method('handleRequest')
+            ->with($request);
+
         $mockForm->expects($this->once())
             ->method('createView')
             ->will($this->returnValue($mockView));
@@ -434,13 +451,6 @@ class HelperControllerTest extends \PHPUnit_Framework_TestCase
 
             $twig->addRuntimeLoader($runtimeLoader);
         }
-        $request = new Request(array(
-            'code' => 'sonata.post.admin',
-            'objectId' => 42,
-            'field' => 'enabled',
-            'value' => 1,
-            'context' => 'list',
-        ), array(), array(), array(), array(), array('REQUEST_METHOD' => 'POST'));
 
         $pool = new Pool($container, 'title', 'logo');
         $pool->setAdminServiceIds(array('sonata.post.admin'));
